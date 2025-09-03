@@ -1,3 +1,4 @@
+// frontend/src/components/LoginButton.tsx
 import React from 'react';
 
 const LoginButton: React.FC = () => {

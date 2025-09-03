@@ -1,5 +1,6 @@
+// frontend/src/components/Dashboard.tsx
 import React, { useEffect, useState } from 'react';
-import api from '../services/api';
+import axios from 'axios';
 import { BarChart, Bar, XAxis, YAxis, Tooltip } from 'recharts';
 
 interface RepoData {
@@ -7,24 +8,34 @@ interface RepoData {
   stargazers_count: number;
 }
 
-const Dashboard: React.FC = () => {
+interface DashboardProps {
+  token: string;
+}
+
+const Dashboard: React.FC<DashboardProps> = ({ token }) => {
   const [repos, setRepos] = useState<RepoData[]>([]);
 
   useEffect(() => {
-    api.get('/github/repos') // создадим этот endpoint на backend
+    axios.get('http://localhost:4000/auth/github/repos', {
+      headers: { Authorization: `Bearer ${token}` }
+    })
       .then(res => setRepos(res.data))
       .catch(err => console.error(err));
-  }, []);
+  }, [token]);
 
   return (
     <div>
       <h2>Your Repositories</h2>
-      <BarChart width={600} height={300} data={repos}>
-        <XAxis dataKey="name" />
-        <YAxis />
-        <Tooltip />
-        <Bar dataKey="stargazers_count" fill="#8884d8" />
-      </BarChart>
+      {repos.length === 0 ? (
+        <p>No repositories found.</p>
+      ) : (
+        <BarChart width={600} height={300} data={repos}>
+          <XAxis dataKey="name" />
+          <YAxis />
+          <Tooltip />
+          <Bar dataKey="stargazers_count" fill="#8884d8" />
+        </BarChart>
+      )}
     </div>
   );
 };
